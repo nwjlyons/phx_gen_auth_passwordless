@@ -12,7 +12,7 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
 
     binding = [context: context, schema: schema]
 
-    paths = generator_paths()
+    paths = [".", :phx_gen_auth_passwordless, :phoenix]
 
     context
     |> copy_new_files(binding, paths)
@@ -27,6 +27,7 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
     [
       {:eex, "schema_user.ex", Path.join([context.dir, "#{schema.singular}.ex"])},
       {:eex, "schema_user_sign_in_code.ex", Path.join([context.dir, "#{schema.singular}_sign_in_code.ex"])},
+      {:eex, "context.ex", "#{context.dir}.ex"}
     ]
   end
 
@@ -35,9 +36,5 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
     Mix.Phoenix.copy_from(paths, "priv/templates/phx.gen.auth.passwordless", binding, files)
 
     context
-  end
-
-  defp generator_paths do
-    [".", :phx_gen_auth_passwordless, :phoenix]
   end
 end
