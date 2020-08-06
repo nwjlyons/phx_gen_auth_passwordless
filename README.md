@@ -13,7 +13,7 @@
     ```
 1. Install and compile the dependencies
 
-    ```shell
+    ```
     $ mix do deps.get, deps.compile
     ```
 
@@ -21,6 +21,6 @@
 
 From the root of your phoenix app you can install the authentication system with the following command
 
-```shell
+```
 $ mix phx.gen.auth.passwordless Accounts User users
 ```
