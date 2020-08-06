@@ -7,7 +7,7 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
 
   def run(args) do
     {context, schema} = Gen.Context.build(args, __MODULE__)
-    
+
     Gen.Context.prompt_for_code_injection(context)
 
     binding = [context: context, schema: schema]
