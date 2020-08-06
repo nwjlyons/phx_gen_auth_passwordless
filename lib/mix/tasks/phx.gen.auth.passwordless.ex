@@ -25,7 +25,8 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
     web_path = to_string(schema.web_path)
 
     [
-      {:eex, "schema.ex", Path.join([context.dir, "#{schema.singular}.ex"])},
+      {:eex, "schema_user.ex", Path.join([context.dir, "#{schema.singular}.ex"])},
+      {:eex, "schema_user_sign_in_code.ex", Path.join([context.dir, "#{schema.singular}_sign_in_code.ex"])},
     ]
   end
 
