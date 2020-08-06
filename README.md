@@ -1,21 +1,26 @@
 # PhxGenAuthPasswordless
 
-**TODO: Add description**
-
 ## Installation
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `phx_gen_auth_passwordless` to your list of dependencies in `mix.exs`:
+1. Add `phx_gen_auth_passwordless` to your list of dependencies in `mix.exs`
 
-```elixir
-def deps do
-  [
-    {:phx_gen_auth_passwordless, "~> 0.1.0"}
-  ]
-end
+    ```elixir
+    def deps do
+      [
+        {:phx_gen_auth_passwordless, path: "../phx_gen_auth_passwordless", only: :dev, runtime: false}
+      ]
+    end
+    ```
+1. Install and compile the dependencies
+
+    ```shell
+    $ mix do deps.get, deps.compile
+    ```
+
+### Running the generator
+
+From the root of your phoenix app you can install the authentication system with the following command
+
+```shell
+$ mix phx.gen.auth.passwordless Accounts User users
 ```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/phx_gen_auth_passwordless](https://hexdocs.pm/phx_gen_auth_passwordless).
-
