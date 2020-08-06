@@ -1,4 +1,4 @@
-# PhxGenAuthPasswordless
+# Phx.Gen.Auth.Passwordless
 
 ## Installation
 
