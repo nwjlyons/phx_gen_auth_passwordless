@@ -1,6 +1,5 @@
 defmodule <%= inspect schema.module %>SignInCode do
   import Ecto.Changeset
-  import RedSnowWeb.Gettext
 
   schema "<%= schema.table %>_sign_in_codes" do
     field :code, :string, virtual: true
@@ -28,9 +27,9 @@ defmodule <%= inspect schema.module %>SignInCode do
     |> validate_code()
   end
 
-  defp validate_code(changeset) do
+  def validate_code(%Ecto.Changeset{} = changeset) do
     changeset
-    |> validate_format(:code, ~r/^\d{6}$/, message: gettext("should be six digits. eg. 000000"))
+    |> validate_format(:code, ~r/^\d{6}$/, message: "should be six digits. eg. 000000")
   end
 
   defp maybe_hash_code(changeset) do
