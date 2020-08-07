@@ -6,6 +6,9 @@ defmodule <%= inspect schema.module %>SignInCode do
   @sign_in_code_regex Regex.compile!("^\\d{" <> Integer.to_string(@sign_in_code_length) <> "}$")
   @sign_in_code_example Enum.reduce(1..@sign_in_code_length, "", fn _, acc -> acc <> "0" end)
 
+<%= if schema.binary_id do %>
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id<% end %>
   schema "<%= schema.table %>_sign_in_codes" do
     field :code, :string, virtual: true
     field :hashed_code, :string
