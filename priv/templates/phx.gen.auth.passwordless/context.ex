@@ -248,10 +248,19 @@ defmodule <%= inspect context.module %> do
     #   * Bamboo - https://hexdocs.pm/bamboo
     #
     Logger.debug("""
-    To: #{<%= schema.singular %>.email}
-    Subject: Sign in code: #{<%= schema.singular %>_sign_in_code.code}
 
-    Sign in code: #{<%= schema.singular %>_sign_in_code.code}
+    ==============================
+
+    Hi #{<%= schema.singular %>.email},
+
+    You can complete signing in by using this code:
+
+    #{<%= schema.singular %>_sign_in_code.code}
+
+    If you didn't request this code, please ignore this.
+
+    ==============================
+
     """)
   end
 end
