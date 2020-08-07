@@ -11,6 +11,19 @@ defmodule <%= inspect context.module %> do
   @lifespan_of_<%= schema.singular %>_sign_in_code_in_minutes 15
 
   @doc """
+  Returns the list of <%= schema.plural %>.
+
+  ## Examples
+
+      iex> list_<%= schema.plural %>()
+      [%<%= inspect schema.alias %>{}, ...]
+
+  """
+  def list_<%= schema.plural %> do
+    Repo.all(<%= inspect schema.alias %>)
+  end
+
+  @doc """
   Gets a single <%= schema.singular %>.
 
   ## Examples
