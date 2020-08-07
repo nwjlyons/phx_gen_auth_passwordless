@@ -6,7 +6,7 @@ defmodule <%= inspect context.module %> do
   alias <%= inspect context.module %>.{<%= inspect schema.alias %>, <%= inspect schema.alias %>SignInCode}
 
   @max_sign_in_attempts 3
-  @lifespan_of_sign_in_code_in_minutes 15
+  @lifespan_of_<%= schema.singular %>_sign_in_code_in_minutes 15
 
   @doc """
   Gets a single <%= schema.singular %>.
@@ -36,7 +36,7 @@ defmodule <%= inspect context.module %> do
       nil
 
   """
-  def get_<%= schema.singular %>_by_email(email) when is_binary(email) do
+  def get_<%= schema.singular %>_by_email(email) do
     Repo.get_by(<%= inspect schema.alias %>, email: email)
   end
 
@@ -106,7 +106,7 @@ defmodule <%= inspect context.module %> do
   def get_<%= schema.singular %>_sign_in_code(id) do
     from(s in <%= inspect schema.alias %>SignInCode,
       where: s.id == ^id,
-      where: s.inserted_at >= ago(@lifespan_of_sign_in_code_in_minutes, "minute"),
+      where: s.inserted_at >= ago(@lifespan_of_<%= schema.singular %>_sign_in_code_in_minutes, "minute"),
       where: s.sign_in_attempts < @max_sign_in_attempts
     )
     |> Repo.one()
@@ -144,15 +144,27 @@ defmodule <%= inspect context.module %> do
   end
 
   @doc """
-  """
-  def get_and_validate_sign_in_code(code_id, code_from_user) when is_binary(code_from_user) do
-    case get_sign_in_code(code_id) do
-      %<%= inspect schema.alias %>SignInCode{} = sign_in_code ->
-        increment_sign_in_code_attempts(sign_in_code)
+  Check sign in code.
 
-        if SignInCode.valid_code?(sign_in_code, code_from_user) do
-          delete_sign_in_code(sign_in_code)
-          {:ok, sign_in_code}
+  ## Examples
+
+      iex> check_sign_in_code("123", "000000")
+      {:ok, %<%= inspect schema.alias %>SignInCode{}}
+
+      iex> check_sign_in_code("123", "notvalid")
+      {:error, :not_valid}
+
+      iex> check_sign_in_code("456", "000000")
+      {:error, :not_found_or_expired}
+  """
+  def check_sign_in_code(code_id, code_from_user) when is_binary(code_from_user) do
+    case get_<%= schema.singular %>_sign_in_code(code_id) do
+      %<%= inspect schema.alias %>SignInCode{} = <%= schema.singular %>_sign_in_code ->
+        increment_sign_in_code_attempts(<%= schema.singular %>_sign_in_code)
+
+        if <%= inspect schema.alias %>SignInCode.valid_code?(<%= schema.singular %>_sign_in_code, code_from_user) do
+          delete_<%= schema.singular %>_sign_in_code(<%= schema.singular %>_sign_in_code)
+          {:ok, <%= schema.singular %>_sign_in_code}
         else
           {:error, :not_valid}
         end
