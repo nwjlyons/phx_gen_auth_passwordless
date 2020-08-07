@@ -240,7 +240,7 @@ defmodule <%= inspect context.module %> do
     Bcrypt.no_user_verify()
   end
 
-  defp notify_<%= schema.singular %>_of_sign_in_code(<%= schema.singular %>, code) do
+  defp notify_<%= schema.singular %>_of_sign_in_code(<%= schema.singular %>, <%= schema.singular %>_sign_in_code) do
     # For simplicity, this function simply logs messages to the terminal.
     # You should replace it by a proper e-mail or notification tool, such as:
     #
@@ -249,9 +249,9 @@ defmodule <%= inspect context.module %> do
     #
     Logger.debug("""
     To: #{<%= schema.singular %>.email}
-    Subject: Sign in code: #{code}
+    Subject: Sign in code: #{<%= schema.singular %>_sign_in_code.code}
 
-    Sign in code: #{code}
+    Sign in code: #{<%= schema.singular %>_sign_in_code.code}
     """)
   end
 end

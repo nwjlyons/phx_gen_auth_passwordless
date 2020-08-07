@@ -3,6 +3,7 @@ defmodule <%= inspect schema.module %>SignInCode do
   import Ecto.Changeset
 
   @sign_in_code_length 6
+  @sign_in_code_regex Regex.compile!("^\\d{" <> Integer.to_string(@sign_in_code_length) <> "}$")
   @sign_in_code_example Enum.reduce(1..@sign_in_code_length, "", fn _, acc -> acc <> "0" end)
 
   schema "<%= schema.table %>_sign_in_codes" do
@@ -34,7 +35,7 @@ defmodule <%= inspect schema.module %>SignInCode do
   def validate_code(%Ecto.Changeset{} = changeset) do
     changeset
     |> validate_format(
-      :code, ~r/^\d{@sign_in_code_length}$/,
+      :code, @sign_in_code_regex,
       message: "should be #{@sign_in_code_length} digits. eg. #{@sign_in_code_example}"
     )
   end
