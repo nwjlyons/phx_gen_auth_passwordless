@@ -197,7 +197,7 @@ defmodule <%= inspect context.module %> do
       where: s.id == ^<%= schema.singular %>_sign_in_code.id
     )
     |> Repo.update_all(inc: [sign_in_attempts: 1])
-    |> Tuple.elem(0)
+    |> elem(0)
   end
 
   @doc """
