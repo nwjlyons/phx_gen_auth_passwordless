@@ -2,6 +2,8 @@ defmodule <%= inspect context.module %> do
 
   require Logger
 
+  import Ecto.Query, warn: false
+
   alias <%= inspect schema.repo %>
   alias <%= inspect context.module %>.{<%= inspect schema.alias %>, <%= inspect schema.alias %>SignInCode}
 
@@ -160,7 +162,7 @@ defmodule <%= inspect context.module %> do
   def check_sign_in_code(code_id, code_from_user) when is_binary(code_from_user) do
     case get_<%= schema.singular %>_sign_in_code(code_id) do
       %<%= inspect schema.alias %>SignInCode{} = <%= schema.singular %>_sign_in_code ->
-        increment_sign_in_code_attempts(<%= schema.singular %>_sign_in_code)
+        increment_sign_in_attempts(<%= schema.singular %>_sign_in_code)
 
         if <%= inspect schema.alias %>SignInCode.valid_code?(<%= schema.singular %>_sign_in_code, code_from_user) do
           delete_<%= schema.singular %>_sign_in_code(<%= schema.singular %>_sign_in_code)

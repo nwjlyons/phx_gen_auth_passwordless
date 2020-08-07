@@ -1,4 +1,5 @@
 defmodule <%= inspect schema.module %>SignInCode do
+  use Ecto.Schema
   import Ecto.Changeset
 
   @sign_in_code_length 6
