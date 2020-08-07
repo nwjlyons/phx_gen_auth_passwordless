@@ -1,7 +1,12 @@
 defmodule <%= inspect context.module %> do
 
+  require Logger
+
   alias <%= inspect schema.repo %>
   alias <%= inspect context.module %>.{<%= inspect schema.alias %>, <%= inspect schema.alias %>SignInCode}
+
+  @max_sign_in_attempts 3
+  @lifespan_of_sign_in_code_in_minutes 15
 
   @doc """
   Gets a single <%= schema.singular %>.
@@ -85,5 +90,141 @@ defmodule <%= inspect context.module %> do
   """
   def delete_<%= schema.singular %>(%<%= inspect schema.alias %>{} = <%= schema.singular %>) do
     Repo.delete(<%= schema.singular %>)
+  end
+
+  @doc """
+  Gets a single <%= schema.singular %>_sign_in_code that has not exceeded the lifespan or the number of sign in attempts.
+
+  ## Examples
+
+      iex> get_<%= schema.singular %>_sign_in_code("123")
+      %<%= inspect schema.alias %>SignInCode{}
+
+      iex> get_<%= schema.singular %>_sign_in_code("456")
+      nil
+  """
+  def get_<%= schema.singular %>_sign_in_code(id) do
+    from(s in <%= inspect schema.alias %>SignInCode,
+      where: s.id == ^id,
+      where: s.inserted_at >= ago(@lifespan_of_sign_in_code_in_minutes, "minute"),
+      where: s.sign_in_attempts < @max_sign_in_attempts
+    )
+    |> Repo.one()
+  end
+
+  @doc """
+  Creates a <%= schema.singular %>_sign_in_code and notifies the <%= schema.singular %>.
+
+  ## Examples
+
+      iex> create_<%= schema.singular %>_sign_in_code("exists@example.com")
+      {:ok, %<%= inspect schema.alias %>SignInCode{}}
+
+      iex> create_<%= schema.singular %>("does-not-exist@example.com")
+      {:error, :user_not_found}
+
+  """
+  def create_<%= schema.singular %>_sign_in_code_and_notify_<%= schema.singular %>(email) do
+    Logger.info("creating <%= schema.singular %> sign in code for email=#{email}")
+
+    case get_<%= schema.singular %>_by_email(email) do
+      %<%= inspect schema.alias %>{} = <%= schema.singular %> ->
+        case create_<%= schema.singular %>_sign_in_code(<%= schema.singular %>) do
+          {:ok, <%= schema.singular %>_sign_in_code} ->
+            notify_<%= schema.singular %>_of_sign_in_code(<%= schema.singular %>, <%= schema.singular %>_sign_in_code)
+            {:ok, <%= schema.singular %>_sign_in_code}
+
+          {:error, _changeset} ->
+            {:error, :not_valid}
+        end
+
+      nil ->
+        {:error, :user_not_found}
+    end
+  end
+
+  @doc """
+  """
+  def get_and_validate_sign_in_code(code_id, code_from_user) when is_binary(code_from_user) do
+    case get_sign_in_code(code_id) do
+      %<%= inspect schema.alias %>SignInCode{} = sign_in_code ->
+        increment_sign_in_code_attempts(sign_in_code)
+
+        if SignInCode.valid_code?(sign_in_code, code_from_user) do
+          delete_sign_in_code(sign_in_code)
+          {:ok, sign_in_code}
+        else
+          {:error, :not_valid}
+        end
+
+      nil ->
+        mitigate_against_timing_attacks()
+        {:error, :not_found_or_expired}
+    end
+  end
+
+  def get_and_validate_sign_in_code(_code_id, _code), do: {:error, :not_found}
+
+  @doc """
+  Increments the number of sign in attempts for <%= schema.singular %>_sign_in_code.
+
+  It returns the number of entries affected.
+
+   ## Examples
+
+      iex> increment_sign_in_attempts("123")
+      1
+
+      iex> increment_sign_in_attempts("456")
+      0
+  """
+  def increment_sign_in_attempts(%<%= inspect schema.alias %>SignInCode{} = <%= schema.singular %>_sign_in_code) do
+    from(s in <%= inspect schema.alias %>SignInCode,
+      where: s.id == ^<%= schema.singular %>_sign_in_code.id
+    )
+    |> Repo.update_all(inc: [sign_in_attempts: 1])
+    |> Tuple.elem(0)
+  end
+
+  @doc """
+  Deletes a <%= schema.singular %>_sign_in_code.
+
+  ## Examples
+
+      iex> delete_<%= schema.singular %>_sign_in_code(<%= schema.singular %>_sign_in_code)
+      {:ok, %<%= inspect schema.alias %>SignInCode{}}
+
+      iex> delete_<%= schema.singular %>_sign_in_code(<%= schema.singular %>_sign_in_code)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_<%= schema.singular %>_sign_in_code(%<%= inspect schema.alias %>SignInCode{} = <%= schema.singular %>_sign_in_code) do
+    Repo.delete(<%= schema.singular %>_sign_in_code)
+  end
+
+  defp create_<%= schema.singular %>_sign_in_code(%<%= inspect schema.alias %>{id: <%= schema.singular %>_id}) do
+    %<%= inspect schema.alias %>SignInCode{}
+    |> <%= inspect schema.alias %>SignInCode.create_changeset(%{user_id: user_id, code: <%= inspect schema.alias %>SignInCode.generate_sign_in_code()})
+    |> Repo.insert()
+  end
+
+  defp mitigate_against_timing_attacks() do
+    # Simulate work to mitigate against timing attacks.
+    Bcrypt.no_user_verify()
+  end
+
+  defp notify_<%= schema.singular %>_of_sign_in_code(<%= schema.singular %>, code) do
+    # For simplicity, this function simply logs messages to the terminal.
+    # You should replace it by a proper e-mail or notification tool, such as:
+    #
+    #   * Swoosh - https://hexdocs.pm/swoosh
+    #   * Bamboo - https://hexdocs.pm/bamboo
+    #
+    Logger.debug("""
+    To: #{<%= schema.singular %>.email}
+    Subject: Sign in code: #{code}
+
+    Sign in code: #{code}
+    """)
   end
 end

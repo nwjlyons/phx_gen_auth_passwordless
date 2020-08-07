@@ -1,6 +1,9 @@
 defmodule <%= inspect schema.module %>SignInCode do
   import Ecto.Changeset
 
+  @sign_in_code_length 6
+  @sign_in_code_example Enum.reduce(1..@sign_in_code_length, "", fn _, acc -> acc <> "0" end)
+
   schema "<%= schema.table %>_sign_in_codes" do
     field :code, :string, virtual: true
     field :hashed_code, :string
@@ -29,7 +32,14 @@ defmodule <%= inspect schema.module %>SignInCode do
 
   def validate_code(%Ecto.Changeset{} = changeset) do
     changeset
-    |> validate_format(:code, ~r/^\d{6}$/, message: "should be six digits. eg. 000000")
+    |> validate_format(
+      :code, ~r/^\d{@sign_in_code_length}$/,
+      message: "should be #{@sign_in_code_length} digits. eg. #{@sign_in_code_example}"
+    )
+  end
+
+  def generate_sign_in_code() do
+    Enum.map(1..@sign_in_code_length, fn _ -> Enum.random(0..9) end) |> Enum.join("")
   end
 
   defp maybe_hash_code(changeset) do
@@ -43,7 +53,7 @@ defmodule <%= inspect schema.module %>SignInCode do
   end
 
   def valid_code?(%__MODULE__{hashed_code: hashed_code}, code)
-      when is_binary(hashed_code) and byte_size(code) == 6 do
+      when is_binary(hashed_code) and byte_size(code) == @sign_in_code_length do
     Bcrypt.verify_pass(code, hashed_code)
   end
 
