@@ -231,7 +231,7 @@ defmodule <%= inspect context.module %> do
 
   defp create_<%= schema.singular %>_sign_in_code(%<%= inspect schema.alias %>{id: <%= schema.singular %>_id}) do
     %<%= inspect schema.alias %>SignInCode{}
-    |> <%= inspect schema.alias %>SignInCode.create_changeset(%{user_id: user_id, code: <%= inspect schema.alias %>SignInCode.generate_sign_in_code()})
+    |> <%= inspect schema.alias %>SignInCode.create_changeset(%{user_id: user_id})
     |> Repo.insert()
   end
 

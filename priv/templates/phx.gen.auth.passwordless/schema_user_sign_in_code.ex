@@ -11,9 +11,9 @@ defmodule <%= inspect schema.module %>SignInCode do
   @foreign_key_type :binary_id<% end %>
   schema "<%= schema.table %>_sign_in_codes" do
     field :code, :string, virtual: true
-    field :hashed_code, :string
     belongs_to :<%= schema.singular %>, <%= inspect schema.module %>
-    field :sign_in_attempts, :integer
+    field :hashed_code, :string
+    field :sign_in_attempts, :integer, default: 0
 
     timestamps(updated_at: false)
   end
@@ -21,40 +21,18 @@ defmodule <%= inspect schema.module %>SignInCode do
   @doc false
   def create_changeset(<%= schema.singular %>_sign_in_code, attrs) do
     <%= schema.singular %>_sign_in_code
-    |> cast(attrs, [:code, :user_id])
-    |> validate_required([:code, :user_id])
-    |> validate_code()
-    |> maybe_hash_code()
+    |> cast(attrs, [:user_id])
+    |> validate_required([:user_id])
+    |> generate_code()
     |> foreign_key_constraint(:user_id)
   end
 
-  def check_changeset(<%= schema.singular %>_sign_in_code, attrs) do
-    <%= schema.singular %>_sign_in_code
-    |> cast(attrs, [:code])
-    |> validate_required([:code])
-    |> validate_code()
-  end
-
-  def validate_code(%Ecto.Changeset{} = changeset) do
+  def validate_format_of_code(%Ecto.Changeset{} = changeset) do
     changeset
     |> validate_format(
       :code, @sign_in_code_regex,
       message: "should be #{@sign_in_code_length} digits. eg. #{@sign_in_code_example}"
     )
-  end
-
-  def generate_sign_in_code() do
-    Enum.map(1..@sign_in_code_length, fn _ -> Enum.random(0..9) end) |> Enum.join("")
-  end
-
-  defp maybe_hash_code(changeset) do
-    code = get_change(changeset, :code)
-
-    if code && changeset.valid? do
-      put_change(changeset, :hashed_code, Bcrypt.hash_pwd_salt(code))
-    else
-      changeset
-    end
   end
 
   def valid_code?(%__MODULE__{hashed_code: hashed_code}, code)
@@ -64,5 +42,13 @@ defmodule <%= inspect schema.module %>SignInCode do
 
   def valid_code?(_, _) do
     Bcrypt.no_user_verify()
+  end
+
+  defp generate_code(changeset) do
+    code = Enum.map(1..@sign_in_code_length, fn _ -> Enum.random(0..9) end) |> Enum.join("")
+
+    changeset
+    |> put_change(:code, code)
+    |> put_change(:hashed_code, Bcrypt.hash_pwd_salt(code))
   end
 end
