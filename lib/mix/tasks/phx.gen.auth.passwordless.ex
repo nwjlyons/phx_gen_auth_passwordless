@@ -1,6 +1,20 @@
 defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
   @shortdoc "Generates passwordless authentication logic for a resource"
 
+  @moduledoc """
+  Generates passwordless authentication logic for a resource.
+
+      mix phx.gen.auth.passwordless Accounts User users
+
+  The first argument is the context module followed by the schema module
+  and its plural name (used as the schema table name).
+
+  ## Binary ids
+
+  The `--binary-id` option causes the generated migration to use
+  `binary_id` for its primary key and foreign keys.
+  """
+
   use Mix.Task
   alias Mix.Phoenix.{Context, Schema}
   alias Mix.Tasks.Phx.Gen
