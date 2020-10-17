@@ -52,6 +52,7 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
       {:eex, "schema_user_sign_in_code.ex", Path.join([context.dir, "#{schema.singular}_sign_in_code.ex"])},
       {:eex, "form_create_sign_in_code.ex", Path.join([web_prefix, "forms", "create_sign_in_code_form.ex"])},
       {:eex, "form_check_sign_in_code.ex", Path.join([web_prefix, "forms", "check_sign_in_code_form.ex"])},
+      {:eex, "view_sign_in_code.ex", Path.join([web_prefix, "views", "sign_in_code_view.ex"])},
       {:eex, "context.ex", "#{context.dir}.ex"},
       {:eex, "migration.ex", Path.join([migrations_prefix, "#{timestamp()}_create_#{schema.table}_auth_tables.exs"])},
     ]

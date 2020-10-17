@@ -1,4 +1,4 @@
-defmodule <%= inspect context.base_module %>.CheckSignInCodeForm do
+defmodule <%= inspect context.web_module %>.CheckSignInCodeForm do
   use Ecto.Schema
   import Ecto.Changeset
 
