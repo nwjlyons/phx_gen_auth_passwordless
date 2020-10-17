@@ -36,16 +36,33 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
     files = files_to_be_generated(context)
     Mix.Phoenix.copy_from(paths, "priv/templates/phx.gen.auth.passwordless", binding, files)
 
+    IO.puts("""
+
+Update router.ex
+
+    scope "/users", #{inspect context.web_module} do
+     pipe_through :browser
+
+     scope "/sign-in" do
+       get "/", SignInCodeController, :create
+       post "/", SignInCodeController, :create
+       get "/check", SignInCodeController, :check
+       post "/check", SignInCodeController, :check
+     end
+    end
+
+    pipeline :protected do
+      plug #{inspect context.web_module}.Auth.Plugs.AuthenticationRequired
+      plug #{inspect context.web_module}.Auth.Plugs.FetchUserFromSession
+    end
+""")
+
     context
   end
 
   defp files_to_be_generated(%Context{schema: schema, context_app: context_app} = context) do
     web_prefix = Mix.Phoenix.web_path(context_app)
-    web_test_prefix = Mix.Phoenix.web_test_path(context_app)
     migrations_prefix = Mix.Phoenix.context_app_path(context_app, "priv/repo/migrations")
-    web_path = to_string(schema.web_path)
-
-    IO.inspect(context)
 
     [
       {:eex, "schema_user.ex", Path.join([context.dir, "#{schema.singular}.ex"])},
