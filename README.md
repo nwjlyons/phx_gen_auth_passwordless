@@ -24,28 +24,4 @@
     $ mix phx.gen.auth.passwordless Accounts User users
     ```
 
-1. Update `router.ex`
-
-    ```elixir
-    scope "/users", ...Web do
-     pipe_through :browser
-       
-     scope "/sign-in" do
-       get "/", SignInCodeController, :create
-       post "/", SignInCodeController, :create
-       get "/check", SignInCodeController, :check
-       post "/check", SignInCodeController, :check
-     end
-    end
-    
-    pipeline :protected do
-      plug ...Web.Auth.Plugs.AuthenticationRequired
-      plug ...Web.Auth.Plugs.FetchUserFromSession
-    end
-   
-    scope "/", ...Web do
-      pipe_through [:browser, :protected]
-      
-      # Protected routes  
-    end
-    ```
+1. Update `router.ex` with routes printed by the generator to stdout.
