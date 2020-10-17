@@ -14,14 +14,41 @@
     ```
 1. Install and compile the dependencies
 
-    ```
+    ```bash
     $ mix do deps.get, deps.compile
     ```
 
-### Running the generator
+1. From the root of your phoenix app you can install the authentication system with the following command
+ 
+    ```bash
+    $ mix phx.gen.auth.passwordless Accounts User users
+    ```
 
-From the root of your phoenix app you can install the authentication system with the following command
+1. Update `router.ex`
 
-```
-$ mix phx.gen.auth.passwordless Accounts User users
-```
+    ```elixir
+    ...
+    pipeline :protected do
+         plug ...Web.Auth.Plugs.AuthenticationRequired
+         plug ...Web.Auth.Plugs.FetchUserFromSession
+    end
+    
+    scope "/users", ...Web do
+         pipe_through :browser
+    
+         scope "/sign-in" do
+               get "/", SignInCodeController, :create
+               post "/", SignInCodeController, :create
+               get "/check", SignInCodeController, :check
+               post "/check", SignInCodeController, :check
+         end
+    
+         delete "/sign-out", SessionController, :sign_out
+    end
+    
+    scope "/", ...Web do
+         pipe_through [:browser, :protected]
+        
+         get "/", PageController, :index, as: :root
+    end
+    ```
