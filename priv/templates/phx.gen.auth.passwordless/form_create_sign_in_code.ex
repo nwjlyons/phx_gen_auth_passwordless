@@ -1,21 +1,22 @@
-defmodule <%= inspect context.web_module %>.CheckSignInCodeForm do
+defmodule <%= inspect context.web_module %>.CreateSignInCodeForm do
   use Ecto.Schema
   import Ecto.Changeset
 
   embedded_schema do
-    field :code, :string
+    field :email, :string
   end
 
   def changeset(attrs \\ %{}) do
     %__MODULE__{}
-    |> cast(attrs, [:code])
-    |> validate_required([:code])
-    |> update_change(:code, &String.trim/1)
-    |> validate_format(:code, ~r/^\d{6}$/, message: "should be six digits. eg. 000000")
+    |> cast(attrs, [:email])
+    |> validate_required([:email])
+    |> update_change(:email, &String.trim/1)
+    |> validate_format(:email, ~r/^[^\s]+@[^\s]+$/, message: "not a valid email")
+    |> validate_length(:email, max: 160)
   end
 
   def validate(attrs) do
     changeset(attrs)
-    |> apply_action(:check_sign_in_code)
+    |> apply_action(:create_sign_in_code)
   end
 end

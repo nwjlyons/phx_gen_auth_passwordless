@@ -3,12 +3,12 @@ defmodule <%= inspect context.web_module %>.SignInCodeController do
 
   require Logger
 
-  alias RedSnow.SignInCodes
-  alias RedSnowWeb.Auth
+  alias <%= inspect context.module %>
+  alias <%= inspect context.web_module %>.Auth
   alias <%= inspect context.web_module %>.CheckSignInCodeForm
   alias <%= inspect context.web_module %>.CreateSignInCodeForm
 
-  plug RedSnowWeb.Auth.Plugs.RedirectIfUserIsAuthenticated
+  plug <%= inspect context.web_module %>.Auth.Plugs.RedirectIfUserIsAuthenticated
 
   def create(%{method: "GET"} = conn, _params) do
     changeset = CreateSignInCodeForm.changeset()
@@ -18,7 +18,7 @@ defmodule <%= inspect context.web_module %>.SignInCodeController do
   def create(%{method: "POST"} = conn, %{"sign_in_code" => sign_in_code_params}) do
     case CreateSignInCodeForm.validate(sign_in_code_params) do
       {:ok, create_sign_in_code_form} ->
-        case SignInCodes.create_sign_in_code(create_sign_in_code_form.email) do
+        case <%= inspect context.alias %>.create_user_sign_in_code_and_notify_user(create_sign_in_code_form.email) do
           {:ok, sign_in_code} ->
             conn
             |> put_session(:sign_in_code_id, sign_in_code.id)
@@ -44,14 +44,14 @@ defmodule <%= inspect context.web_module %>.SignInCodeController do
   def check(%{method: "POST"} = conn, %{"sign_in_code" => sign_in_code_params}) do
     case CheckSignInCodeForm.validate(sign_in_code_params) do
       {:ok, create_sign_in_code_form} ->
-        case SignInCodes.get_and_validate_sign_in_code(
+        case <%= inspect context.alias %>.get_and_validate_sign_in_code(
                get_session(conn, :sign_in_code_id),
                create_sign_in_code_form.code
              ) do
           {:ok, sign_in_code} ->
             conn
             |> Auth.sign_in(sign_in_code.user_id)
-            |> redirect(to: Routes.page_index_path(conn, :index))
+            |> redirect(to: "/")
 
           {:error, reason} ->
             Logger.debug("sign in check failed: #{inspect(reason)}")

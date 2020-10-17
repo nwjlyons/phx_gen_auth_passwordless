@@ -27,28 +27,25 @@
 1. Update `router.ex`
 
     ```elixir
-    ...
-    pipeline :protected do
-         plug ...Web.Auth.Plugs.AuthenticationRequired
-         plug ...Web.Auth.Plugs.FetchUserFromSession
-    end
-    
     scope "/users", ...Web do
-         pipe_through :browser
-    
-         scope "/sign-in" do
-               get "/", SignInCodeController, :create
-               post "/", SignInCodeController, :create
-               get "/check", SignInCodeController, :check
-               post "/check", SignInCodeController, :check
-         end
-    
-         delete "/sign-out", SessionController, :sign_out
+     pipe_through :browser
+       
+     scope "/sign-in" do
+       get "/", SignInCodeController, :create
+       post "/", SignInCodeController, :create
+       get "/check", SignInCodeController, :check
+       post "/check", SignInCodeController, :check
+     end
     end
     
+    pipeline :protected do
+      plug ...Web.Auth.Plugs.AuthenticationRequired
+      plug ...Web.Auth.Plugs.FetchUserFromSession
+    end
+   
     scope "/", ...Web do
-         pipe_through [:browser, :protected]
-        
-         get "/", PageController, :index, as: :root
+      pipe_through [:browser, :protected]
+      
+      # Protected routes  
     end
     ```
