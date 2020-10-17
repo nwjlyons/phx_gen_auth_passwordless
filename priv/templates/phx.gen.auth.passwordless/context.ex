@@ -190,8 +190,6 @@ defmodule <%= inspect context.module %> do
     end
   end
 
-  def get_and_validate_sign_in_code(_code_id, _code), do: {:error, :not_found}
-
   @doc """
   Increments the number of sign in attempts for <%= schema.singular %>_sign_in_code.
 

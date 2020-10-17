@@ -4,7 +4,7 @@ defmodule <%= inspect context.web_module %>.Auth do
 
   @key :user_id
 
-  def sign_in(%Plug.Conn{} = conn, user_id) when is_binary(user_id) do
+  def sign_in(%Plug.Conn{} = conn, user_id) do
     Logger.info("sign in user user_id=#{user_id}")
 
     conn

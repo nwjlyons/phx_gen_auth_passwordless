@@ -44,7 +44,7 @@ defmodule <%= inspect context.web_module %>.SignInCodeController do
   def check(%{method: "POST"} = conn, %{"sign_in_code" => sign_in_code_params}) do
     case CheckSignInCodeForm.validate(sign_in_code_params) do
       {:ok, create_sign_in_code_form} ->
-        case <%= inspect context.alias %>.get_and_validate_sign_in_code(
+        case <%= inspect context.alias %>.check_sign_in_code(
                get_session(conn, :sign_in_code_id),
                create_sign_in_code_form.code
              ) do
