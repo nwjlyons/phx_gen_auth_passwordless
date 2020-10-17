@@ -45,9 +45,13 @@ defmodule Mix.Tasks.Phx.Gen.Auth.Passwordless do
     migrations_prefix = Mix.Phoenix.context_app_path(context_app, "priv/repo/migrations")
     web_path = to_string(schema.web_path)
 
+    IO.inspect(context)
+
     [
       {:eex, "schema_user.ex", Path.join([context.dir, "#{schema.singular}.ex"])},
       {:eex, "schema_user_sign_in_code.ex", Path.join([context.dir, "#{schema.singular}_sign_in_code.ex"])},
+      {:eex, "form_create_sign_in_code.ex", Path.join([web_prefix, "forms", "create_sign_in_code_form.ex"])},
+      {:eex, "form_check_sign_in_code.ex", Path.join([web_prefix, "forms", "check_sign_in_code_form.ex"])},
       {:eex, "context.ex", "#{context.dir}.ex"},
       {:eex, "migration.ex", Path.join([migrations_prefix, "#{timestamp()}_create_#{schema.table}_auth_tables.exs"])},
     ]
