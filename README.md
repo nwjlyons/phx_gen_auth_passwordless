@@ -7,7 +7,7 @@
     ```elixir
     def deps do
       [
-        {:phx_gen_auth_passwordless, path: "../phx_gen_auth_passwordless", only: :dev, runtime: false},
+        {:phx_gen_auth_passwordless, github: "nwjlyons/phx_gen_auth_passwordless", only: :dev, runtime: false},
         {:bcrypt_elixir, "~> 2.0"},
       ]
     end
